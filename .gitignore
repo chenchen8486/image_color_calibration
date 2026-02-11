@@ -23,11 +23,13 @@ dist/
 *.spec
 
 # Logs
-logs/
+logs/*
+!logs/.gitkeep
 *.log
 
 # Project specific results and temp data
-3_result/
+3_result/*
+!3_result/.gitkeep
 
 # Images
 *.bmp
@@ -46,3 +48,8 @@ logs/
 
 # Excel files (often data)
 # *.xlsx
+
+# Keep these directories even if empty (redundant if !.gitkeep is used above, but good for clarity)
+!*/.gitkeep
+!*/*/.gitkeep
+!*/*/*/.gitkeep
