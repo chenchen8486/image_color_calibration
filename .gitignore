@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+build/
+dist/
+*.spec
+
+# Logs
+logs/
+*.log
+
+# Project specific results and temp data
+3_result/
+
+# Images
+*.bmp
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.tiff
+*.ico
+
+# Large data/Model files (Optional, verify if user wants to keep these or not, but usually good to ignore large binaries if not tracked)
+# Un-comment if you want to ignore model files and large binaries
+# *.pkl
+# *.bin
+# *.ttf
+
+# Excel files (often data)
+# *.xlsx
