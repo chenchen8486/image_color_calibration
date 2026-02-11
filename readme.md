@@ -42,12 +42,12 @@ Project\_Root/
 │   └── capture.jpg
 │
 └── 3\_result/            <-- [输出] 程序自动生成结果
-&nbsp;   |
-&nbsp;   ├── 1\_test\_temp\_location.jpg  (调试图: 模板定位)
-&nbsp;   ├── 2\_test\_insp\_location.jpg  (调试图: 采集图定位)
-&nbsp;   ├── 3\_calib\_before.jpg         (调试图：校正前图像)
-&nbsp;   ├── 4\_calib\_after.jpg          (调试图：校正后图像)
-&nbsp;   └── map\_data\rgb_to_srgb.bin    (最终生成的标定文件，约49M，直接复制设备现有文件即可)
+   |
+   ├── 1\_test\_temp\_location.jpg  (调试图: 模板定位)
+   ├── 2\_test\_insp\_location.jpg  (调试图: 采集图定位)
+   ├── 3\_calib\_before.jpg         (调试图：校正前图像)
+   ├── 4\_calib\_after.jpg          (调试图：校正后图像)
+   └── map\_data\rgb_to_srgb.bin    (最终生成的标定文件，约49M，直接复制设备现有文件即可)
 
 ```
 
@@ -71,6 +71,5 @@ v1.0.0 发布版：色卡标定第一版本。
 
 ## 6. 参与者
 - 开发者: 陈晨
-- 版本维护者：王锋（英文：William.Wang）
-- 联系方式: 136 6116 1150 
+
 
