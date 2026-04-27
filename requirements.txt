@@ -1,27 +1,12 @@
-# 相机色彩矫正标定系统 - Python 依赖列表
-# 安装命令: pip install -r requirements.txt
+# Camera Color Calibration Tool - Python Dependencies
+# Install command: pip install -r requirements.txt
 
-# 核心图像处理
-opencv-python==4.13.0.92
-
-# 数值计算
-numpy==1.26.4
-
-# 数据表格处理
-pandas==2.2.2
-openpyxl==3.1.5
-
-# 进度条显示
-tqdm==4.66.5
-
-# 图像科学计算 (网格峰值检测)
-scikit-image==0.24.0
-
-# 机器学习模型 (MLP 回归训练)
-scikit-learn==1.5.1
-
-# 模型序列化保存/加载
-joblib==1.4.2
-
-# 打包工具 (开发时使用)
-pyinstaller==6.19.0
+opencv-python
+numpy
+pandas
+openpyxl
+tqdm
+scikit-image
+scikit-learn
+joblib
+pyinstaller

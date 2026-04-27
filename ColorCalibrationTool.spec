@@ -10,7 +10,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['PySide6', 'PySide2', 'PyQt6'],
+    excludes=['PySide6', 'PySide2', 'PyQt6', 'PyQt5'],
     noarchive=False,
     optimize=0,
 )

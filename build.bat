@@ -44,8 +44,9 @@ if exist "1_template" (
     echo         - Copied 1_template/
 )
 if exist "2_capture" (
-    xcopy /E /I /Y "2_capture\*" "dist\ColorCalibrationTool\2_capture\" >nul
-    echo         - Copied 2_capture/
+    echo         - Created empty 2_capture/ (user will place match.bmp here)
+) else (
+    echo         - Created empty 2_capture/
 )
 if exist "config.ini" (
     copy /Y "config.ini" "dist\ColorCalibrationTool\config.ini" >nul
