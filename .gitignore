@@ -20,7 +20,8 @@ pip-delete-this-directory.txt
 # Build
 build/
 dist/
-*.spec
+run.spec
+!ColorCalibrationTool.spec
 
 # Logs
 logs/*
