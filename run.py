@@ -103,25 +103,30 @@ class ConfigManager:
         if not os.path.exists(self.config_path):
             logging.info("未检测到配置文件，正在生成默认 config.ini ...")
             self.cfg['PATHS'] = {
-                'TemplateDir': '1_template',
-                'CaptureDir': '2_capture',
-                'ResultDir': '3_result',
-                'TestDir': '4_test_data'
+                'templatedir': '1_template',
+                'capturedir': '2_capture',
+                'resultdir': '3_result',
+                'testdir': '4_test_data'
             }
             self.cfg['MATCHING'] = {
-                'Scale': '0.5',
-                'MarginRatio': '0.25',
-                'MatchScore': '0.6'
+                'scale': '0.5',
+                'marginratio': '0.25',
+                'matchscore': '0.6'
             }
             self.cfg['GRID'] = {
-                'RowNum': '49',
-                'ColNum': '33'
+                'rownum': '49',
+                'colnum': '33'
             }
             self.cfg['DEBUG'] = {
-                'PatchRadius': '30',
-                'ShowDebugImages': 'True'
+                'patchradius': '30',
+                'showdebugimages': 'True'
             }
-            with open(self.config_path, 'w', encoding='utf-8') as f:
+            self.cfg['COLOR'] = {
+                'linear_gain': '0.90',
+                'highlight_contrast': '1.3',
+                'saturation_gain': '1.1'
+            }
+            with open(self.config_path, 'w', encoding='utf-8-sig') as f:
                 self.cfg.write(f)
         else:
             logging.info(f"加载配置文件: {self.config_path}")
@@ -199,9 +204,9 @@ def match_fine(original_img, original_template, coarse_x, coarse_y, scale, margi
 
 def match_lut_roi(temp_img, match_image):
     # 使用全局 config_manager
-    scale = config_manager.get_float('MATCHING', 'Scale', 0.5)
-    margin_ratio = config_manager.get_float('MATCHING', 'MarginRatio', 0.25)
-    match_score_thr = config_manager.get_float('MATCHING', 'MatchScore', 0.6)
+    scale = config_manager.get_float('MATCHING', 'scale', 0.5)
+    margin_ratio = config_manager.get_float('MATCHING', 'marginratio', 0.25)
+    match_score_thr = config_manager.get_float('MATCHING', 'matchscore', 0.6)
 
     resize_temp_img = cv2.resize(temp_img, None, fx=scale, fy=scale)
     resize_match_image = cv2.resize(match_image, None, fx=scale, fy=scale)
@@ -223,8 +228,8 @@ def match_lut_roi(temp_img, match_image):
 
 
 def validate_grid_robust(centers, img_shape):
-    rows = config_manager.get_int('GRID', 'RowNum', 49)
-    cols = config_manager.get_int('GRID', 'ColNum', 33)
+    rows = config_manager.get_int('GRID', 'rownum', 49)
+    cols = config_manager.get_int('GRID', 'colnum', 33)
 
     pts = np.array(centers)
     h_img, w_img = img_shape[:2]
@@ -299,7 +304,7 @@ def save_debug_image_with_indices(img, centers, save_name):
     if img is None or not centers:
         return
 
-    save_result_root = config_manager.get_path('ResultDir')
+    save_result_root = config_manager.get_path('resultdir')
     vis_img = img.copy()
     font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -318,10 +323,10 @@ def save_debug_image_with_indices(img, centers, save_name):
 
 def train_and_generate_lut():
     # 1. 获取配置
-    input_temp_path = config_manager.get_path('TemplateDir')
-    input_insp_path = config_manager.get_path('CaptureDir')
-    save_result_root = config_manager.get_path('ResultDir')
-    patch_radius = config_manager.get_int('DEBUG', 'PatchRadius', 30)
+    input_temp_path = config_manager.get_path('templatedir')
+    input_insp_path = config_manager.get_path('capturedir')
+    save_result_root = config_manager.get_path('resultdir')
+    patch_radius = config_manager.get_int('DEBUG', 'patchradius', 30)
 
     # 2. 创建目录
     for folder in [input_temp_path, input_insp_path, save_result_root]:
@@ -464,7 +469,12 @@ def train_and_generate_lut():
             # --- Step 7 ---
             pbar.set_description(steps[6])
             logging.info("[Step 7] 开始: 创建查找表 (LUT)")
-            create_lut(save_result_root, save_result_root, bit_num=8)
+            linear_gain = config_manager.get_float('COLOR', 'linear_gain', 0.90)
+            highlight_contrast = config_manager.get_float('COLOR', 'highlight_contrast', 1.3)
+            saturation_gain = config_manager.get_float('COLOR', 'saturation_gain', 1.1)
+            logging.info(f"LUT颜色参数 -> linear_gain={linear_gain}, highlight_contrast={highlight_contrast}, saturation_gain={saturation_gain}")
+            create_lut(save_result_root, save_result_root, bit_num=8,
+                       linear_gain=linear_gain, highlight_contrast=highlight_contrast, saturation_gain=saturation_gain)
             logging.info("LUT 创建完成")
             pbar.update(1)
 
@@ -483,8 +493,8 @@ def run_inference_test():
     """
     独立的功能模块：加载标定结果，对 4_test_data/input 中的图片进行矫正，结果存入 4_test_data/output
     """
-    save_result_root = config_manager.get_path('ResultDir')
-    test_root = config_manager.get_path('TestDir')
+    save_result_root = config_manager.get_path('resultdir')
+    test_root = config_manager.get_path('testdir')
 
     # 构造 input 和 output 路径
     input_dir = os.path.join(test_root, 'input')

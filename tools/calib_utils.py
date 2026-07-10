@@ -125,7 +125,8 @@ def load_model(load_root_):
     return mlp_regressor, scaler_X, scaler_L, scaler_a, scaler_b
 
 
-def generate_rgb_to_lab_lut(mlp_regressor, scaler_X, scaler_L, scaler_a, scaler_b, save_root, bit_num=8):
+def generate_rgb_to_lab_lut(mlp_regressor, scaler_X, scaler_L, scaler_a, scaler_b, save_root, bit_num=8,
+                            linear_gain=0.90, highlight_contrast=1.3, saturation_gain=1.1):
     gray_scale = pow(2, bit_num)
     step = 255 / (gray_scale - 1)
     lookup_table_lab = np.zeros((gray_scale, gray_scale, gray_scale, 3), dtype=np.float64)
@@ -151,7 +152,8 @@ def generate_rgb_to_lab_lut(mlp_regressor, scaler_X, scaler_L, scaler_a, scaler_
     lab_values[:, 2] = np.clip(lab_values[:, 2], -128, 127)
 
     # 转换为 sRGB (此时 lab_values 是 (N, 3) 的二维数组)
-    srgb_values = convert_lab_to_srgb(lab_values)
+    srgb_values = convert_lab_to_srgb(lab_values, linear_gain=linear_gain,
+                                      highlight_contrast=highlight_contrast, saturation_gain=saturation_gain)
 
     index = 0
     for r in range(gray_scale):
@@ -262,14 +264,18 @@ def lch_to_lab(lch):
 
 
 # 2026.2.5 工业视觉专用版：线性保真映射 (Linear Fidelity Mapping)
-# 2026.2.5 增强版：线性增益 + 高光对比度扩展 默认：0.9/1.2/1， 最佳：0.9/1.3/1.1
+# 2026.2.5 增强版：线性增益 + Gamma 调整 默认：0.9/1.2/1， 最佳：0.9/1.3/1.1
 def convert_lab_to_srgb(lab_image, linear_gain=0.90, highlight_contrast=1.3, saturation_gain=1.1):
     """
-    :param linear_gain: 线性增益 (<1.0)，先压暗整体，留出高光余量
-    :param highlight_contrast: 高光对比度系数 (Gamma值)。
-           > 1.0 (如 1.5~2.2): 拉伸高光细节，增强白纸上的浅色划痕。
-           = 1.0: 线性保真。
-    :param saturation_gain: 饱和度增益
+    :param linear_gain: 整体亮度缩放系数。
+           <1.0: 压暗整体，给高光留余量，防止过曝死白；
+           =1.0: 保持原亮度；
+           >1.0: 提亮整体，画面变白，但高光容易死白。
+    :param highlight_contrast: Gamma 曲线系数，控制整体明暗和对比度。
+           数值越大：整体越暗，暗部压缩越多，对比度越低；
+           数值越小：整体越亮，暗部被拉起，对比度越高；
+           =1.0: 保持 linear_gain 后的线性亮度关系。
+    :param saturation_gain: 饱和度增益，1.0 表示不调整。
     """
     lab_image = lab_image.astype(np.float64)
 
@@ -282,16 +288,19 @@ def convert_lab_to_srgb(lab_image, linear_gain=0.90, highlight_contrast=1.3, sat
     xyz = lab_to_xyz(lab_processed)
     linear_rgb = xyz_to_linear_rgb(xyz)
 
-    # 3. 核心步骤：先压暗，再拉伸
+    # 3. 核心步骤：先缩放亮度，再做 Gamma 调整
 
-    # 3.1 线性压暗 (Headroom)
-    # 必须先把亮度降下来，比如降到 0.9 max，否则后面的拉伸会顶到 1.0 死白
+    # 3.1 线性亮度缩放 (Headroom)
+    # linear_gain < 1 时先压暗，给后续 Gamma 调整留出高光余量，防止死白。
     linear_rgb *= linear_gain
     linear_rgb = np.clip(linear_rgb, 0.0, 1.0)
 
-    # 3.2 高光对比度扩展 (Gamma Expansion)
-    # 公式: y = x ^ gamma (gamma > 1)
-    # 作用：让亮部(0.8-1.0)的曲线变陡，从而放大该区域的灰度差异
+    # 3.2 Gamma 调整
+    # 公式: y = x ^ gamma
+    # 作用:
+    #   gamma > 1: 压暗暗部，整体变暗，对比度降低；
+    #   gamma < 1: 提亮暗部，整体变亮，对比度增加；
+    #   gamma = 1: 保持 linear_gain 后的线性关系。
     linear_rgb = np.power(linear_rgb, highlight_contrast)
 
     # 4. 转 sRGB
@@ -301,9 +310,11 @@ def convert_lab_to_srgb(lab_image, linear_gain=0.90, highlight_contrast=1.3, sat
     return srgb_uint8
 
 
-def create_lut(load_model_root_, save_lut_root_, bit_num=8):
+def create_lut(load_model_root_, save_lut_root_, bit_num=8,
+               linear_gain=0.90, highlight_contrast=1.3, saturation_gain=1.1):
     mlp_regressor, scaler_X, scaler_L, scaler_a, scaler_b = load_model(load_model_root_)
-    generate_rgb_to_lab_lut(mlp_regressor, scaler_X, scaler_L, scaler_a, scaler_b, save_lut_root_, bit_num=bit_num)
+    generate_rgb_to_lab_lut(mlp_regressor, scaler_X, scaler_L, scaler_a, scaler_b, save_lut_root_, bit_num=bit_num,
+                            linear_gain=linear_gain, highlight_contrast=highlight_contrast, saturation_gain=saturation_gain)
 
 
 def train_data(excel_file_path_, save_root_, train_data_key_dict, sheet_name='sheet1'):
