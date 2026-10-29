@@ -148,7 +148,7 @@ venv\Scripts\pip.exe install -r requirements.txt -i https://pypi.tuna.tsinghua.e
 
 - `[1/4] Checking PyInstaller...` — 脚本正在检查 venv 中的打包工具是否正常。
 - `[2/4] Building executable (directory mode -D)...` — **这是最重要的一步，也是最耗时的一步**，通常需要 **1~10 分钟**。期间窗口可能看起来没有变化，这是正常的。
-- `[3/4] Preparing release folder...` — 打包已完成，脚本正在把产物整理到 `release/` 目录，复制必需的文件夹和配置文件，并生成 `使用说明.txt`。打包产生的 `build/`、`dist/` 临时目录会在这一步被自动清理。
+- `[3/4] Preparing required folders and files...` — 打包已完成，脚本正在把程序运行必需的文件夹（如 `data/1_template`）和配置文件复制到 `dist/ColorCalibrationTool/` 分发目录中，并生成 `使用说明.txt`。打包产生的 `build/` 临时目录会在这一步被自动清理。
 - `[4/4] Verifying build result...` — 脚本正在检查最终生成的文件是否完整。
 
 当窗口中出现以下字样时，表示打包成功：
@@ -158,7 +158,7 @@ venv\Scripts\pip.exe install -r requirements.txt -i https://pypi.tuna.tsinghua.e
   Build Success!
 ========================================
 
-Output directory: release\ColorCalibrationTool\
+Output directory: dist\ColorCalibrationTool\
 ```
 
 > **温馨提示：为什么打包后不是一个单独的 `.exe` 文件，而是一整个文件夹？**
@@ -169,7 +169,7 @@ Output directory: release\ColorCalibrationTool\
 `build.bat` 已自动把所有必需的文件复制到分发目录中，你不需要手动复制任何东西：
 
 ```text
-release/ColorCalibrationTool/      # 最终分发包文件夹
+dist/ColorCalibrationTool/      # 最终分发包文件夹
 │
 ├── ColorCalibrationTool.exe       # [主程序] 双击即可运行
 ├── _internal/                     # [依赖库] 程序运行必需的库文件，不可删除
@@ -190,7 +190,7 @@ release/ColorCalibrationTool/      # 最终分发包文件夹
 
 ### 如何把程序发给其他人使用
 
-只需要做一件事：**将整个 `release/ColorCalibrationTool/` 文件夹拷贝给对方即可。**
+只需要做一件事：**将整个 `dist/ColorCalibrationTool/` 文件夹拷贝给对方即可。**
 
 对方使用 Windows 系统的电脑，无需安装 Python，无需安装任何其他软件或运行库，也无需进行任何配置。对方收到文件夹后，把实拍色卡图命名为 `match.bmp` 放入 `data/2_capture/`，然后双击 `ColorCalibrationTool.exe` 即可使用。
 
@@ -200,7 +200,7 @@ release/ColorCalibrationTool/      # 最终分发包文件夹
 
 ### v1.3.0 发布版
 *   **目录结构**：所有输入/输出数据目录（`1_template` ~ `4_test_data`）统一收拢到 `data/` 下，工程根目录更简洁。
-*   **打包优化**：打包产物统一输出到 `release/ColorCalibrationTool/`，并自动生成 `使用说明.txt`；`build/`、`dist/` 中间目录在打包完成后自动清理。
+*   **打包优化**：打包产物统一输出到 `dist/ColorCalibrationTool/`，并自动生成 `使用说明.txt`；`build/` 中间目录在打包完成后自动清理。
 *   **打包修复**：`build.bat` 强制使用项目 `venv` 中的 PyInstaller，避免误用系统全局 Python 环境打包。
 
 ### v1.2.0 发布版
