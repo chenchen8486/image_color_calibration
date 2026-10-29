@@ -103,10 +103,10 @@ class ConfigManager:
         if not os.path.exists(self.config_path):
             logging.info("未检测到配置文件，正在生成默认 config.ini ...")
             self.cfg['PATHS'] = {
-                'templatedir': '1_template',
-                'capturedir': '2_capture',
-                'resultdir': '3_result',
-                'testdir': '4_test_data'
+                'templatedir': 'data/1_template',
+                'capturedir': 'data/2_capture',
+                'resultdir': 'data/3_result',
+                'testdir': 'data/4_test_data'
             }
             self.cfg['MATCHING'] = {
                 'scale': '0.5',
@@ -478,7 +478,7 @@ def train_and_generate_lut():
             logging.info("LUT 创建完成")
             pbar.update(1)
 
-        print("\n>>> 训练成功！LUT文件已生成在 3_result 文件夹。")
+        print("\n>>> 训练成功！LUT文件已生成在 data/3_result 文件夹。")
         logging.info(">>> 训练流程成功结束")
 
     except Exception as e:
@@ -491,7 +491,7 @@ def train_and_generate_lut():
 
 def run_inference_test():
     """
-    独立的功能模块：加载标定结果，对 4_test_data/input 中的图片进行矫正，结果存入 4_test_data/output
+    独立的功能模块：加载标定结果，对 data/4_test_data/input 中的图片进行矫正，结果存入 data/4_test_data/output
     """
     save_result_root = config_manager.get_path('resultdir')
     test_root = config_manager.get_path('testdir')

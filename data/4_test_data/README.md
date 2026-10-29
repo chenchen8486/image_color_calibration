@@ -23,7 +23,7 @@
 ## 3. 目录结构
 
 ```text
-4_test_data/
+data/4_test_data/
 ├── test.cpp              # 主程序与核心函数
 ├── test.bmp              # 输入图像（示例）
 ├── debug/                # debug=true 时生成的调试图片目录

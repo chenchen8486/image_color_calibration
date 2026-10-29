@@ -20,6 +20,7 @@ pip-delete-this-directory.txt
 # Build
 build/
 dist/
+release/
 run.spec
 !ColorCalibrationTool.spec
 
@@ -29,8 +30,8 @@ logs/*
 *.log
 
 # Project specific results and temp data
-3_result/*
-!3_result/.gitkeep
+data/3_result/*
+!data/3_result/.gitkeep
 
 # Images
 *.bmp
